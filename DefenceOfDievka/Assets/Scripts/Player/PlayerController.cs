@@ -40,9 +40,7 @@ public class PlayerController : NetworkBehaviour
 
         characterController = GetComponent<CharacterController>();
 
-        // Lock cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        CanvasManager.Instance.OpenHUD("cursor");
     }
 
     private void PlayerMovement()

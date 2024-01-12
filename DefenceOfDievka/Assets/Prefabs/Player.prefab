@@ -75,6 +75,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2ae0a192867824e95ca3f16f5c0a75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   rayRange: 3
 --- !u!114 &3098322044377964580
 MonoBehaviour:
@@ -88,7 +91,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae79430feb99d334ba6dc041060093a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemList: []
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  itemList:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   currentCellNumber: 0
 --- !u!114 &5240929643498382584
 MonoBehaviour:
@@ -120,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
+  syncDirection: 1
   syncMode: 0
   syncInterval: 0
   target: {fileID: 5240929643498382582}

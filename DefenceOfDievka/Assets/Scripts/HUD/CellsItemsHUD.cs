@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CellsItemsHUD : MonoBehaviour
+public class CellsItemsHUD : MonoBehaviour, IStaticScript
 {
     private static CellsItemsHUD _instance;
     public static CellsItemsHUD Instance
@@ -20,17 +18,35 @@ public class CellsItemsHUD : MonoBehaviour
     [SerializeField] private Sprite nullSprite;
     [SerializeField] private List<InventoryCell> cellsImages;
 
-    private void Start()
-    {
-        _instance = this;
-    }
-
     public void Inst()
     {
+        _instance = this;
         SetInventoryCells();
-        HUD_Switcher.Instance.ChangeCellItem += SetCurrentCell;
         SetCurrentCell(0);
+        ScriptOrderLoader.AllScriptsLoaded += AddSubscribe;
     }
+
+    public void AddSubscribe()
+    {
+        HUD_Switcher.Instance.ChangeCellItem += SetCurrentCell;
+    }
+
+    public void UpdateInventoryCells(PlayerInventory playerInventory)
+    {
+        List<Entity> inventory = playerInventory.GetInventory();
+        for (int i = 0; i < cellsImages.Count; i++)
+        {
+            if (inventory[i] == null)
+            {
+                cellsImages[i].SetImageInCell(nullSprite);
+            }
+            else
+            {
+                cellsImages[i].SetImageInCell(inventory[i].ItemSprite);
+            }
+        }
+    }
+
 
     public void SetInventoryCells()
     {

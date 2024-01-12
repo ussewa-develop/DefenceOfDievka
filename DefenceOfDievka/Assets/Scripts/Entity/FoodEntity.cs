@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class FoodEntity : Entity
 {
-    [SerializeField] Sprite foodSprite;
-
+    
     public override void Use()
     {
         base.Use();

@@ -1,21 +1,23 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 
-public class CanvasManager : MonoBehaviour
+public class CanvasManager : MonoBehaviour, IStaticScript
 {
     private static CanvasManager _instance;
     public static CanvasManager Instance { get { return _instance; } }
 
     [SerializeField] List<HUD> huds;
     [SerializeField] private CursorHUD cursorHud;
+    [SerializeField] public TextMeshProUGUI serverText;
 
-    void Start()
+    public void Inst()
     {
         _instance = this;
         for (int i = 0; i < transform.childCount; i++)
         {
-            if(transform.GetChild(i).gameObject.GetComponent<HUD>())
+            if (transform.GetChild(i).gameObject.GetComponent<HUD>())
             {
                 huds.Add(transform.GetChild(i).gameObject.GetComponent<HUD>());
                 huds[i].Init();

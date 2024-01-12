@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class HUD_Switcher : MonoBehaviour
+public class HUD_Switcher : MonoBehaviour, IStaticScript
 {
     private static HUD_Switcher _instance;
     public static HUD_Switcher Instance
@@ -20,11 +20,11 @@ public class HUD_Switcher : MonoBehaviour
 
     private bool gameIsPaused = false;
 
-    private void Start()
+
+    public void Inst()
     {
         _instance = this;
         GamePaused += PauseGame;
-        CellsItemsHUD.Instance.Inst();
     }
 
     private void Update()
@@ -37,6 +37,7 @@ public class HUD_Switcher : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             InvokeChangeCellItem(0);
+            Debug.Log("Нажал 1");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
