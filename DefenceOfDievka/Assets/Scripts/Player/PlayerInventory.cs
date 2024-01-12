@@ -20,6 +20,7 @@ public class PlayerInventory : NetworkBehaviour
             return;
         }
         HUD_Switcher.Instance.ChangeCellItem += CmdSetCurrentCell;
+        HUD_Switcher.Instance.ChangeCellItem += CmdChangePickUpItem;
         Debug.Log("itemList.COunt = " + itemList.Count);
     }
 
@@ -30,6 +31,15 @@ public class PlayerInventory : NetworkBehaviour
             return;
         }
         Interact();
+        if(Input.GetKeyDown(KeyCode.G))
+        {
+            CmdDropItem(currentCellNumber);
+        }
+        if(Input.GetMouseButtonDown(0))
+        {
+            CmdUseItem(currentCellNumber);
+            CmdDropItem(currentCellNumber);
+        }
     }
 
     private void Interact()
@@ -45,16 +55,93 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void RPC_SetCurrentCell(int cellNumber)
+    public void RefreshCellsInHUD()
     {
-        currentCellNumber = cellNumber;
+        if (isLocalPlayer)
+        {
+            CellsItemsHUD.Instance.RefreshInventoryCells(this);
+        }
+    }
+
+    [Command]
+    private void CmdUseItem(int cellNumber)
+    {
+        RPC_UseItem(cellNumber);
+    }
+
+    [ClientRpc]
+    private void RPC_UseItem(int cellNumber)
+    {
+
+        if (itemList[cellNumber] != null)
+        {
+            itemList[cellNumber].Use();
+        }
+    }
+
+    [Command]
+    private void CmdChangePickUpItem(int cellNumber)
+    {
+        RPC_ChangePickUpItem(cellNumber);
+    }
+
+    [ClientRpc]
+    private void RPC_ChangePickUpItem(int cellNumber)
+    {
+        for(int i = 0; i < itemList.Count; i++)
+        {
+            if (itemList[i] != null)
+            {
+                if (i != currentCellNumber)
+                {
+                    itemList[i].gameObject.SetActive(false);
+                }
+                else
+                {
+                    itemList[i].gameObject.SetActive(true);
+                }
+            }
+        }
+    }
+
+
+    [Command]
+    private void CmdDropItem(int cellNumber)
+    {
+        if (itemList[cellNumber] != null)
+        {
+            RPC_DropItem(cellNumber);
+        }
+    }
+
+    [ClientRpc]
+    private void RPC_DropItem(int cellNumber)
+    {
+        itemList[cellNumber].Collider.enabled = true;
+        itemList[cellNumber].Rigidbody.isKinematic = false;
+        itemList[cellNumber].transform.parent = null;
+        itemList[cellNumber] = null;
+        RefreshCellsInHUD();
     }
 
     [Command]
     public void CmdSetCurrentCell(int cellNumber)
     {
         RPC_SetCurrentCell(cellNumber);
+    }
+
+    [ClientRpc]
+    public void RPC_SetCurrentCell(int cellNumber)
+    {
+        currentCellNumber = cellNumber;
+        if (itemList[currentCellNumber] == null)
+        {
+            return;
+        }
+        else
+        {
+
+        }
     }
 
 
@@ -67,18 +154,15 @@ public class PlayerInventory : NetworkBehaviour
     [ClientRpc]
     public void RPC_AddItem(Entity item)
     {
-        CanvasManager.Instance.SetServerMessage("Player " + gameObject.name + " grab " + item.ItemName);
-        AddItem(item);
-    }
-
-    public void AddItem(Entity item)
-    {
-        Debug.Log("Player "+ gameObject.name + " grab item");
+        CanvasManager.Instance.SetServerMessage("Player " + gameObject.name + " grab " + item.Name);
+        Debug.Log("Player " + gameObject.name + " grab item");
         itemList[currentCellNumber] = item;
-        if(isLocalPlayer)
-        {
-            CellsItemsHUD.Instance.RefreshInventoryCells(this);
-        }
+        item.transform.parent = gameObject.transform;
+        item.transform.localPosition = item.Offset;
+        item.transform.localEulerAngles = Vector3.zero;
+        item.Collider.enabled = false;
+        item.Rigidbody.isKinematic = true;
+        RefreshCellsInHUD();
     }
 
     public void RemoveItem(Entity item)

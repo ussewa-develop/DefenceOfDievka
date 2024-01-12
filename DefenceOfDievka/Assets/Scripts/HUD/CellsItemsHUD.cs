@@ -42,7 +42,7 @@ public class CellsItemsHUD : MonoBehaviour, IStaticScript
             }
             else
             {
-                cellsImages[i].SetImageInCell(inventory[i].ItemSprite);
+                cellsImages[i].SetImageInCell(inventory[i].Sprite);
             }
         }
     }
