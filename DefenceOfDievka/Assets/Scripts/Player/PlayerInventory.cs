@@ -8,8 +8,8 @@ public class PlayerInventory : NetworkBehaviour
 {
     private PlayerInventory _instance;
     private PlayerRayCast _player;
-    [SerializeField] private List<Entity> itemList = new List<Entity> {null, null, null, null};
-    [SerializeField] private int currentCellNumber;
+    [SerializeField] private List<Entity> itemList = new List<Entity> { null, null, null, null };
+    [SerializeField, SyncVar] private int currentCellNumber;
 
     private void Start()
     {
@@ -19,13 +19,13 @@ public class PlayerInventory : NetworkBehaviour
         {
             return;
         }
-        HUD_Switcher.Instance.ChangeCellItem += SetCurrentCell;
+        HUD_Switcher.Instance.ChangeCellItem += CmdSetCurrentCell;
         Debug.Log("itemList.COunt = " + itemList.Count);
     }
 
     private void LateUpdate()
     {
-        if(!isLocalPlayer)
+        if (!isLocalPlayer)
         {
             return;
         }
@@ -39,28 +39,35 @@ public class PlayerInventory : NetworkBehaviour
             IGrabbing item = _player.selectedEntity as IGrabbing;
             item.GrabItem(ref _instance);
         }
-        else if(Input.GetKeyDown(KeyCode.E) && _player.selectedEntity != null)
+        else if (Input.GetKeyDown(KeyCode.E) && _player.selectedEntity != null)
         {
             _player.selectedEntity.Use();
         }
     }
 
-    public void SetCurrentCell(int cellNumber)
+    [ClientRpc]
+    public void RPC_SetCurrentCell(int cellNumber)
     {
         currentCellNumber = cellNumber;
     }
 
     [Command]
+    public void CmdSetCurrentCell(int cellNumber)
+    {
+        RPC_SetCurrentCell(cellNumber);
+    }
+
+
+    [Command]
     public void CmdAddItem(Entity item)
     {
-        CanvasManager.Instance.serverText.text = "CmdAddItem";
-        AddItem(item);
+        RPC_AddItem(item);
     }
 
     [ClientRpc]
     public void RPC_AddItem(Entity item)
     {
-        CanvasManager.Instance.serverText.text = "RPC_AddItem";
+        CanvasManager.Instance.SetServerMessage("Player " + gameObject.name + " grab " + item.ItemName);
         AddItem(item);
     }
 
@@ -68,6 +75,10 @@ public class PlayerInventory : NetworkBehaviour
     {
         Debug.Log("Player "+ gameObject.name + " grab item");
         itemList[currentCellNumber] = item;
+        if(isLocalPlayer)
+        {
+            CellsItemsHUD.Instance.RefreshInventoryCells(this);
+        }
     }
 
     public void RemoveItem(Entity item)

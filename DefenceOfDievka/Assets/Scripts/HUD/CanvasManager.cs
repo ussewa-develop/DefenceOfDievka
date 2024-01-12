@@ -27,6 +27,11 @@ public class CanvasManager : MonoBehaviour, IStaticScript
         DontDestroyOnLoad(this);
     }
 
+    public void SetServerMessage(string message)
+    {
+        serverText.text = message;
+    }
+
     
     public void OpenHUD(string hudName)
     {

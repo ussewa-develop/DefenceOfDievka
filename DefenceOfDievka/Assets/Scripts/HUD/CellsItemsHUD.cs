@@ -31,7 +31,7 @@ public class CellsItemsHUD : MonoBehaviour, IStaticScript
         HUD_Switcher.Instance.ChangeCellItem += SetCurrentCell;
     }
 
-    public void UpdateInventoryCells(PlayerInventory playerInventory)
+    public void RefreshInventoryCells(PlayerInventory playerInventory)
     {
         List<Entity> inventory = playerInventory.GetInventory();
         for (int i = 0; i < cellsImages.Count; i++)
