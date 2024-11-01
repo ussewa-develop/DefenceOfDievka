@@ -138,10 +138,6 @@ public class PlayerInventory : NetworkBehaviour
         {
             return;
         }
-        else
-        {
-
-        }
     }
 
 
